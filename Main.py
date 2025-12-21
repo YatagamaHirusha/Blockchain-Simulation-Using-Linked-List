@@ -14,3 +14,11 @@ for block in tst.chain:
     print(f"Data: {block.data}")
     print(f"Hash: {block.hash}")
     print(f"Previous Hash: {block.previous_hash}")
+
+
+print(f"Is chain valid? {tst.is_chain_valid()}")
+
+print("\nAttempting to hack the blockchain...")
+tst.chain[1].data = "1000$ deposited"
+
+print(f"Is chain valid? {tst.is_chain_valid()}")
