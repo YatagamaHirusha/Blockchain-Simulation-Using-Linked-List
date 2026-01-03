@@ -30,6 +30,7 @@ def full_chain():
         'chain': chain_data,
         'length': len(blockchain.chain),
     }
+    return jsonify(response), 200
 
 
 # --- API ROUTE 2: MINE A NEW BLOCK ---
