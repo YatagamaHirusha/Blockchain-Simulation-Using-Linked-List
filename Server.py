@@ -34,3 +34,5 @@ def full_chain():
 # Register new nodes
 @app.route('/nodes/register', methods=['POST'])
 def register_nodes():
+    values = request.get_json()
+    nodes = values.get('nodes')
