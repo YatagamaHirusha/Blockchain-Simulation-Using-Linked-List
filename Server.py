@@ -48,3 +48,24 @@ def register_nodes():
         'total_nodes': list(blockchain.nodes),
     }
     return jsonify(response), 201
+
+# --- API ROUTE 4: CONSENSUS (SYNC) ---
+@app.route('/nodes/resolve', methods=['GET'])
+def consensus():
+    replaced = blockchain.resolve_conflicts()
+
+    if replaced:
+        response = {
+            'message': 'Our chain was replaced',
+            'new_chain': blockchain.chain
+        }
+    else:
+        response = {
+            'message': 'Our chain is authoritative',
+            'chain': blockchain.chain # Note: You might need to serialize this like in /chain
+        }
+    return jsonify(response), 200
+
+if __name__ == '__main__':
+    # We run on port 5000
+    app.run(host='0.0.0.0', port=5000)
