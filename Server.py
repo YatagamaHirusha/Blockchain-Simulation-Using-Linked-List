@@ -31,6 +31,29 @@ def full_chain():
         'length': len(blockchain.chain),
     }
 
+
+# --- API ROUTE 2: MINE A NEW BLOCK ---
+@app.route('/mine', methods=['GET'])
+def mine():
+    # 1. We run the mining algorithm
+    # In a real app, you'd take transactions from pending_transactions
+    # For now, let's just mine a block with some dummy data
+
+    last_block = blockchain.get_latest_block()
+    # Create a new block (using your existing logic)
+    # We add a transaction giving us 1 coin reward
+    blockchain.add_block(f"Block Mined! Reward to {node_identifier}")
+
+    new_block = blockchain.get_latest_block()
+
+    response = {
+        'message': "New Block Forged",
+        'index': new_block.index,
+        'hash': new_block.hash,
+        'data': new_block.data,
+    }
+    return jsonify(response), 200
+
 # Register new nodes
 @app.route('/nodes/register', methods=['POST'])
 def register_nodes():
