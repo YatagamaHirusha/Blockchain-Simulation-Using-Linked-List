@@ -30,3 +30,7 @@ def full_chain():
         'chain': chain_data,
         'length': len(blockchain.chain),
     }
+
+# Register new nodes
+@app.route('/nodes/register', methods=['POST'])
+def register_nodes():
