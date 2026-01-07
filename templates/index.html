@@ -2,9 +2,100 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Blockchain Visualization</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { display: flex; flex-direction: column; align-items: center; }
+
+        /* The Block Card */
+        .block {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            width: 600px;
+            padding: 15px;
+            margin: 10px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* The "Link" Arrow */
+        .arrow {
+            font-size: 30px;
+            color: #333;
+            margin: -5px;
+        }
+
+        .hash { font-family: monospace; color: #d63384; word-break: break-all; }
+        .prev-hash { font-family: monospace; color: #0d6efd; word-break: break-all; }
+
+        button {
+            padding: 10px 20px; font-size: 16px; cursor: pointer;
+            background: #28a745; color: white; border: none; border-radius: 5px;
+        }
+        button:hover { background: #218838; }
+    </style>
 </head>
 <body>
 
+    <div class="container">
+        <h1>🔗 Linked List Blockchain Explorer</h1>
+
+        <div style="margin-bottom: 20px;">
+            <button onclick="mineBlock()">⛏️ Mine New Block</button>
+            <button onclick="resolveConflicts()" style="background: #007bff;">🔄 Sync / Consensus</button>
+        </div>
+
+        <div id="chain-container">
+            </div>
+    </div>
+
+    <script>
+        // 1. Fetch and Display the Chain
+        async function loadChain() {
+            const response = await fetch('/chain');
+            const data = await response.json();
+            const container = document.getElementById('chain-container');
+            container.innerHTML = '';
+
+            data.chain.forEach((block, index) => {
+                // Draw the Arrow (except for the first block)
+                if (index > 0) {
+                    container.innerHTML += `<div class="arrow">⬇</div>`;
+                }
+
+                // Draw the Block
+                const blockHtml = `
+                    <div class="block">
+                        <h3>Block #${block.index}</h3>
+                        <p><strong>🕒 Timestamp:</strong> ${block.timestamp}</p>
+                        <p><strong>📄 Data:</strong> ${block.data}</p>
+                        <p><strong>🔗 Previous Hash:</strong> <span class="prev-hash">${block.previous_hash}</span></p>
+                        <p><strong>🔒 Current Hash:</strong> <span class="hash">${block.hash}</span></p>
+                        <p><small>Nonce: ${block.nonce || 0}</small></p>
+                    </div>
+                `;
+                container.innerHTML += blockHtml;
+            });
+        }
+
+        // 2. Button Logic: Mine
+        async function mineBlock() {
+            alert("Mining started... please wait!");
+            await fetch('/mine');
+            loadChain(); // Refresh page
+        }
+
+        // 3. Button Logic: Sync
+        async function resolveConflicts() {
+            const response = await fetch('/nodes/resolve');
+            const data = await response.json();
+            alert(data.message);
+            loadChain();
+        }
+
+        // Load on startup
+        loadChain();
+    </script>
 </body>
 </html>
