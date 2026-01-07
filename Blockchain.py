@@ -6,6 +6,7 @@ class Blockchain:
         #creating a chain
         self.chain = [self.create_genesis_block()]  #this will add the returned object from below function to a list.
         self.nodes = set()  # Stores unique node addresses in chain
+        self.difficulty = 4
 
     def create_genesis_block(self):
         return Block(0, "Genesis Block", "00000")
@@ -13,13 +14,25 @@ class Blockchain:
     def get_latest_block(self):
         return self.chain[-1]
 
+    # def add_block(self, new_data):
+    #     previous_block = self.get_latest_block()
+    #
+    #     new_index = previous_block.index + 1
+    #
+    #     new_block = Block(new_index, new_data, previous_block.hash)
+    #
+    #     self.chain.append(new_block)
+
     def add_block(self, new_data):
         previous_block = self.get_latest_block()
 
-        new_index = previous_block.index + 1
+        # Create the new block
+        new_block = Block(previous_block.index + 1, new_data, previous_block.hash)
 
-        new_block = Block(new_index, new_data, previous_block.hash)
+        # <--- NEW: We force the computer to solve the puzzle here
+        new_block.mine_block(self.difficulty)
 
+        # Only add it after it is mined
         self.chain.append(new_block)
 
     def is_chain_valid(self):
