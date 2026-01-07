@@ -7,7 +7,7 @@ from uuid import uuid4
 
 # Instantiate our node
 app = Flask(__name__)
-
+node_identifier = str(uuid4()).replace('-', '')
 # Instantiate the blockchain
 blockchain = Blockchain()
 
@@ -36,22 +36,22 @@ def full_chain():
 # --- API ROUTE 2: MINE A NEW BLOCK ---
 @app.route('/mine', methods=['GET'])
 def mine():
-    # 1. We run the mining algorithm
-    # In a real app, you'd take transactions from pending_transactions
-    # For now, let's just mine a block with some dummy data
+    # Since we don't have transactions, we just use a simple string as data.
+    # We include 'node_identifier' so we can see WHICH node created this block.
+    data = f"Block Mined by Node {node_identifier}"
 
-    last_block = blockchain.get_latest_block()
-    # Create a new block (using your existing logic)
-    # We add a transaction giving us 1 coin reward
-    blockchain.add_block(f"Block Mined! Reward to {node_identifier}")
+    # Use your existing function!
+    blockchain.add_block(data)
 
+    # Get the new block to show the user
     new_block = blockchain.get_latest_block()
 
     response = {
         'message': "New Block Forged",
         'index': new_block.index,
-        'hash': new_block.hash,
         'data': new_block.data,
+        'hash': new_block.hash,
+        'previous_hash': new_block.previous_hash,
     }
     return jsonify(response), 200
 
@@ -73,23 +73,59 @@ def register_nodes():
     }
     return jsonify(response), 201
 
-# --- API ROUTE 4: CONSENSUS (SYNC) ---
+# # --- API ROUTE 4: CONSENSUS (SYNC) ---
+# @app.route('/nodes/resolve', methods=['GET'])
+# def consensus():
+#     replaced = blockchain.resolve_conflicts()
+#
+#     if replaced:
+#         response = {
+#             'message': 'Our chain was replaced',
+#             'new_chain': blockchain.chain
+#         }
+#     else:
+#         response = {
+#             'message': 'Our chain is authoritative',
+#             'chain': blockchain.chain # Note: You might need to serialize this like in /chain
+#         }
+#     return jsonify(response), 200
+
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = blockchain.resolve_conflicts()
 
+    # --- FIX START ---
+    # We must convert the Block OBJECTS into simple DICTIONARIES
+    # so Flask can turn them into JSON text.
+    serialized_chain = []
+    for block in blockchain.chain:
+        # We check if it is an Object (has a __dict__) or already a Dictionary
+        if hasattr(block, '__dict__'):
+             # Manually map the fields you want to show
+            serialized_chain.append({
+                'index': block.index,
+                'timestamp': block.timestamp,
+                'data': block.data,
+                'hash': block.hash,
+                'previous_hash': block.previous_hash
+            })
+        else:
+            # If it's already a dictionary (from a sync), just add it
+            serialized_chain.append(block)
+    # --- FIX END ---
+
     if replaced:
         response = {
             'message': 'Our chain was replaced',
-            'new_chain': blockchain.chain
+            'new_chain': serialized_chain
         }
     else:
         response = {
             'message': 'Our chain is authoritative',
-            'chain': blockchain.chain # Note: You might need to serialize this like in /chain
+            'chain': serialized_chain
         }
     return jsonify(response), 200
 
 if __name__ == '__main__':
     # We run on port 5000
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5002)
