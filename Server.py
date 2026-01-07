@@ -5,6 +5,8 @@ from Blockchain import Blockchain
 from Block import Block
 from uuid import uuid4
 
+from flask import Flask, jsonify, request, render_template # <--- Add render_template
+
 # Instantiate our node
 app = Flask(__name__)
 node_identifier = str(uuid4()).replace('-', '')
@@ -125,6 +127,10 @@ def consensus():
             'chain': serialized_chain
         }
     return jsonify(response), 200
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     # We run on port 5000
