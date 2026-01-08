@@ -16,9 +16,9 @@ for block in tst.chain:
     print(f"Previous Hash: {block.previous_hash}")
 
 
-print(f"Is chain valid? {tst.is_chain_valid()}")
+print(f"Doess chain valid? {tst.is_chain_valid()}")
 
-print("\nAttempting to hack the blockchain...")
-tst.chain[1].data = "1000$ deposited"
+print("\nLet's try to hack the blockchain:")
+tst.chain[1].data = "200$ deposited"
 
-print(f"Is chain valid? {tst.is_chain_valid()}")
+print(f"Does chain valid? {tst.is_chain_valid()}")
