@@ -63,8 +63,8 @@ class Blockchain:
         """
         neighbors = self.nodes
         new_chain = None
-
         max_length = len(self.chain)
+
         for node in neighbors:
             try:
                 response = requests.get(f"{node}/chain")
@@ -74,12 +74,26 @@ class Blockchain:
 
                     if length > max_length:
                         max_length = length
-                        new_chain = chain_data
+                        # We don't just assign chain_data; we must convert it back to Objects!
+                        new_chain_objects = []
+                        for block_dict in chain_data:
+                            # Recreate the Block Object
+                            new_block = Block(
+                                block_dict['index'],
+                                block_dict['data'],
+                                block_dict['previous_hash']
+                            )
+                            # CRITICAL: Restore the mined nonce and hash!
+                            new_block.nonce = block_dict['nonce']
+                            new_block.timestamp = block_dict['timestamp']
+                            new_block.hash = block_dict['hash']
 
+                            new_chain_objects.append(new_block)
+
+                        new_chain = new_chain_objects
             except:
                 continue
 
-        # if new chain found, replace existing one
         if new_chain:
             self.chain = new_chain
             return True

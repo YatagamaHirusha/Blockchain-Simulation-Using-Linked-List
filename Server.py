@@ -109,7 +109,8 @@ def consensus():
                 'timestamp': block.timestamp,
                 'data': block.data,
                 'hash': block.hash,
-                'previous_hash': block.previous_hash
+                'previous_hash': block.previous_hash,
+                'nonce': block.nonce
             })
         else:
             # If it's already a dictionary (from a sync), just add it
