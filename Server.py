@@ -1,11 +1,13 @@
 from http.client import responses
 
 from flask import Flask, jsonify, request
-from Blockchain import Blockchain
+
 from Block import Block
 from uuid import uuid4
 
 from flask import Flask, jsonify, request, render_template # <--- Add render_template
+
+from Blockchain import Blockchain
 
 # Instantiate our node
 app = Flask(__name__)
@@ -35,25 +37,56 @@ def full_chain():
     return jsonify(response), 200
 
 
+@app.route('/transactions/new', methods=['POST'])
+def new_transaction():
+    values = request.get_json()
+
+    # Check if data exists
+    if not values or 'data' not in values:
+        return 'Missing values', 400
+
+    # Add to the Blockchain's Mempool (Queue)
+    index = blockchain.add_transactions(values['data'])
+
+    response = {'message': f'Transaction will be added to Block {index}'}
+    return jsonify(response), 201
+
 # --- API ROUTE 2: MINE A NEW BLOCK ---
+# @app.route('/mine', methods=['GET'])
+# def mine():
+#     # Since we don't have transactions, we just use a simple string as data.
+#     # We include 'node_identifier' so we can see WHICH node created this block.
+#     data = f"Block Mined by Node {node_identifier}"
+#
+#     # Use your existing function!
+#     blockchain.add_block(data)
+#
+#     # Get the new block to show the user
+#     new_block = blockchain.get_latest_block()
+#
+#     response = {
+#         'message': "New Block Forged",
+#         'index': new_block.index,
+#         'data': new_block.data,
+#         'hash': new_block.hash,
+#         'previous_hash': new_block.previous_hash,
+#     }
+#     return jsonify(response), 200
+
 @app.route('/mine', methods=['GET'])
 def mine():
-    # Since we don't have transactions, we just use a simple string as data.
-    # We include 'node_identifier' so we can see WHICH node created this block.
-    data = f"Block Mined by Node {node_identifier}"
+    # Attempt to mine the pending transactions
+    mined_block = blockchain.mine_pending_transactions()
 
-    # Use your existing function!
-    blockchain.add_block(data)
-
-    # Get the new block to show the user
-    new_block = blockchain.get_latest_block()
+    if not mined_block:
+        return jsonify({'message': "No transactions to mine! Add data first."}), 400
 
     response = {
         'message': "New Block Forged",
-        'index': new_block.index,
-        'data': new_block.data,
-        'hash': new_block.hash,
-        'previous_hash': new_block.previous_hash,
+        'index': mined_block.index,
+        'data': mined_block.data,
+        'hash': mined_block.hash,
+        'previous_hash': mined_block.previous_hash,
     }
     return jsonify(response), 200
 
@@ -135,4 +168,4 @@ def index():
 
 if __name__ == '__main__':
     # We run on port 5000
-    app.run(host='0.0.0.0', port=5002)
+    app.run(host='0.0.0.0', port=5003)
