@@ -1,4 +1,5 @@
 from Block import Block
+from MemoryPool import MemPool
 import requests
 
 class Blockchain:
@@ -7,12 +8,31 @@ class Blockchain:
         self.chain = [self.create_genesis_block()]  #this will add the returned object from below function to a list.
         self.nodes = set()  # Stores unique node addresses in chain
         self.difficulty = 4
+        self.memPool = MemPool()
+
 
     def create_genesis_block(self):
         return Block(0, "Genesis Block", "00000")
 
     def get_latest_block(self):
         return self.chain[-1]
+
+    def add_transactions(self, transaction_data):
+        self.memPool.add_transaction(transaction_data)
+        return self.get_latest_block().index + 1
+
+    def mine_pending_transactions(self):
+        if self.memPool.isEmpty():
+            return False
+
+        block_data = list(self.memPool.get_transactions())
+        previous_block = self.get_latest_block()
+        new_block = Block(previous_block.index + 1, block_data, previous_block.hash)
+        new_block.mine_block(self.difficulty)
+        self.chain.append(new_block)
+        self.memPool.clear()
+
+        return new_block
 
     # def add_block(self, new_data):
     #     previous_block = self.get_latest_block()

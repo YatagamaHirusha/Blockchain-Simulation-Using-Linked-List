@@ -9,10 +9,7 @@ class MemPool:
         self.rear = None
 
     def isEmpty(self):
-        if self.front is None:
-            return True
-        else:
-            return False
+        return self.front is None
 
     # enqueue
     def add_transaction(self, data):
@@ -27,7 +24,7 @@ class MemPool:
 
     # dequeue
     def get_transactions(self):
-        transactions = []
+        transactions = []   # to hold pending transactions
         current = self.front
         while current is not None:
             transactions.append(current.data)
