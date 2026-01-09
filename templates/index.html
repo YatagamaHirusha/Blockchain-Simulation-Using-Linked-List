@@ -41,6 +41,13 @@
     <div class="container">
         <h1>🔗 Linked List Blockchain Explorer</h1>
 
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; width: 600px;">
+            <h3>📝 Create Transaction (Mempool)</h3>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="txData" placeholder="e.g. Alice pays Bob $10" style="flex: 1; padding: 10px;">
+                <button onclick="submitTransaction()" style="background: #ffc107; color: black;">Add to Queue</button>
+            </div>
+        </div>
         <div style="margin-bottom: 20px;">
             <button onclick="mineBlock()">⛏️ Mine New Block</button>
             <button onclick="resolveConflicts()" style="background: #007bff;">🔄 Sync / Consensus</button>
@@ -136,7 +143,20 @@
                 statusText.style.color = "red";
             }
         }
+        // 5. Button Logic: Submit Transaction
+        async function submitTransaction() {
+            const data = document.getElementById('txData').value;
+            if (!data) return alert("Please enter data");
 
+            await fetch('/transactions/new', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ data: data })
+            });
+
+            document.getElementById('txData').value = '';
+            alert("Data added to Mempool! Now click Mine to seal it.");
+        }
         // Load on startup
         loadChain();
     </script>
