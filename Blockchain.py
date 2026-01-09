@@ -76,11 +76,6 @@ class Blockchain:
         self.nodes.add(address)
 
     def resolve_conflicts(self):
-        """
-        This is the consensus algorithm. It resolves conflicts
-        by replacing our chain with the longest one in the chain (network)
-        If our chain replaced with the longest node, it returns true, if not, false.
-        """
         neighbors = self.nodes
         new_chain = None
         max_length = len(self.chain)
@@ -94,20 +89,17 @@ class Blockchain:
 
                     if length > max_length:
                         max_length = length
-                        # We don't just assign chain_data; we must convert it back to Objects!
+                        # Convert JSON back to Objects
                         new_chain_objects = []
                         for block_dict in chain_data:
-                            # Recreate the Block Object
                             new_block = Block(
                                 block_dict['index'],
                                 block_dict['data'],
                                 block_dict['previous_hash']
                             )
-                            # CRITICAL: Restore the mined nonce and hash!
                             new_block.nonce = block_dict['nonce']
                             new_block.timestamp = block_dict['timestamp']
                             new_block.hash = block_dict['hash']
-
                             new_chain_objects.append(new_block)
 
                         new_chain = new_chain_objects
@@ -115,6 +107,31 @@ class Blockchain:
                 continue
 
         if new_chain:
+            # --- THE RESCUE MISSION STARTS HERE ---
+
+            # 1. Create a checklist of all transactions in the NEW chain
+            # We use a Set for fast lookup
+            new_chain_txs = set()
+            for block in new_chain:
+                # Handle List data (Normal blocks) vs String data (Genesis)
+                if isinstance(block.data, list):
+                    for tx in block.data:
+                        new_chain_txs.add(tx)
+                else:
+                    new_chain_txs.add(block.data)
+
+            # 2. Rescue missing transactions from the OLD chain
+            for block in self.chain:
+                if isinstance(block.data, list):
+                    for tx in block.data:
+                        if tx not in new_chain_txs:
+                            # If this tx is NOT in the new chain, rescue it!
+                            print(f"Rescuing transaction: {tx}")
+                            self.memPool.add_transaction(tx)
+
+            # --- RESCUE MISSION COMPLETE ---
+
             self.chain = new_chain
             return True
+
         return False
