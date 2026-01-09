@@ -24,10 +24,9 @@ class Block:
         return hash.hexdigest()
 
     def mine_block(self, difficulty):
-        # The Target: A hash starting with 'difficulty' number of zeros (e.g., "0000")
+        # This is our target - A hash starting with 'difficulty' number of zeros ("0000")
         target = "0" * difficulty
 
-        # Keep changing the nonce until we get lucky
         while self.hash[:difficulty] != target:
             self.nonce += 1
             self.hash = self.calculate_hash()

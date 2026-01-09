@@ -45,11 +45,9 @@ class Blockchain:
 
     def add_block(self, new_data):
         previous_block = self.get_latest_block()
-
-        # Create the new block
         new_block = Block(previous_block.index + 1, new_data, previous_block.hash)
 
-        # <--- NEW: We force the computer to solve the puzzle here
+        # force the computer to solve the puzzle here
         new_block.mine_block(self.difficulty)
 
         # Only add it after it is mined
@@ -68,11 +66,8 @@ class Blockchain:
 
         return True
 
+    # add node to list (ip address)
     def register_node(self, address):
-        """
-        Add a new node to a list of nodes
-        (Ip address)
-        """
         self.nodes.add(address)
 
     def resolve_conflicts(self):
@@ -89,7 +84,6 @@ class Blockchain:
 
                     if length > max_length:
                         max_length = length
-                        # Convert JSON back to Objects
                         new_chain_objects = []
                         for block_dict in chain_data:
                             new_block = Block(
@@ -107,29 +101,25 @@ class Blockchain:
                 continue
 
         if new_chain:
-            # --- THE RESCUE MISSION STARTS HERE ---
-
-            # 1. Create a checklist of all transactions in the NEW chain
-            # We use a Set for fast lookup
+            # rescue start here - data loss during chain replacement
+            # checklist for all transactions in the new chain
             new_chain_txs = set()
             for block in new_chain:
-                # Handle List data (Normal blocks) vs String data (Genesis)
+                # handle list data (normal blocks) vs string data (Genesis)
                 if isinstance(block.data, list):
                     for tx in block.data:
                         new_chain_txs.add(tx)
                 else:
                     new_chain_txs.add(block.data)
 
-            # 2. Rescue missing transactions from the OLD chain
+            # rescue missing transactions from the old chain
             for block in self.chain:
                 if isinstance(block.data, list):
                     for tx in block.data:
                         if tx not in new_chain_txs:
-                            # If this tx is NOT in the new chain, rescue it!
+                            # If this tx is not in the new chain, rescue it!
                             print(f"Rescuing transaction: {tx}")
                             self.memPool.add_transaction(tx)
-
-            # --- RESCUE MISSION COMPLETE ---
 
             self.chain = new_chain
             return True

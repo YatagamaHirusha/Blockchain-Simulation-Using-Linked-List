@@ -39,23 +39,23 @@
 <body>
 
     <div class="container">
-        <h1>🔗 Linked List Blockchain Explorer</h1>
+        <h1>Blockchain Simulation Using Linkedlist</h1>
 
         <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; width: 600px;">
-            <h3>📝 Create Transaction (Mempool)</h3>
+            <h3>Create Transaction</h3>
             <div style="display: flex; gap: 10px;">
-                <input type="text" id="txData" placeholder="e.g. Alice pays Bob $10" style="flex: 1; padding: 10px;">
-                <button onclick="submitTransaction()" style="background: #ffc107; color: black;">Add to Queue</button>
+                <input type="text" id="txData" placeholder="Transaction data" style="flex: 1; padding: 10px;">
+                <button onclick="submitTransaction()" style="background: #ffc107; color: black;">Enter</button>
             </div>
         </div>
         <div style="margin-bottom: 20px;">
-            <button onclick="mineBlock()">⛏️ Mine New Block</button>
-            <button onclick="resolveConflicts()" style="background: #007bff;">🔄 Sync / Consensus</button>
+            <button onclick="mineBlock()"> Mine New Block</button>
+            <button onclick="resolveConflicts()" style="background: #007bff;">Sync</button>
         </div>
         <div style="background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; width: 600px;">
-            <h3>🌐 Network Manager</h3>
+            <h3>Network Manager</h3>
             <div style="display: flex; gap: 10px;">
-                <input type="text" id="nodeUrl" placeholder="http://localhost:5002" style="flex: 1; padding: 10px;">
+                <input type="text" id="nodeUrl" placeholder="Enter network url" style="flex: 1; padding: 10px;">
                 <button onclick="connectNode()" style="background: #17a2b8;">Connect Node</button>
             </div>
             <p id="network-status" style="margin-top: 10px; color: green;"></p>
@@ -82,10 +82,10 @@
                 const blockHtml = `
                     <div class="block">
                         <h3>Block #${block.index}</h3>
-                        <p><strong>🕒 Timestamp:</strong> ${block.timestamp}</p>
-                        <p><strong>📄 Data:</strong> ${block.data}</p>
-                        <p><strong>🔗 Previous Hash:</strong> <span class="prev-hash">${block.previous_hash}</span></p>
-                        <p><strong>🔒 Current Hash:</strong> <span class="hash">${block.hash}</span></p>
+                        <p><strong>Timestamp:</strong> ${block.timestamp}</p>
+                        <p><strong>Data:</strong> ${block.data}</p>
+                        <p><strong>Previous Hash:</strong> <span class="prev-hash">${block.previous_hash}</span></p>
+                        <p><strong>Current Hash:</strong> <span class="hash">${block.hash}</span></p>
                         <p><small>Nonce: ${block.nonce || 0}</small></p>
                     </div>
                 `;
